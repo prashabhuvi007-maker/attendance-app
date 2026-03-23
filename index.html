@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Employee Attendance</title>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Title */
+h2 {
+    margin-bottom: 10px;
+}
+
+/* Input */
+input {
+    width: 90%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Buttons */
+button {
+    width: 40%;
+    padding: 10px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.checkin {
+    background: #28a745;
+}
+
+.checkout {
+    background: #dc3545;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Message */
+#msg {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Clock */
+#clock {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+        <!-- Company Logo -->
+    <div style="text-align:center; margin-bottom:0px;">
+        <img src="images/logo.png"" alt="Company Logo" style="height: 200px;">
+    </div>
+    
+    <h2>👤 EleganceGeo Employee Attendance</h2>
+    
+    <div id="clock"></div>
+
+    <input id="empId" placeholder="Enter Employee ID">
+
+    <br>
+
+    <button class="checkin" onclick="checkIn()">Check In</button>
+    <button class="checkout" onclick="checkOut()">Check Out</button>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+function updateClock() {
+    let now = new Date();
+    document.getElementById("clock").innerText = now.toLocaleString();
+}
+setInterval(updateClock, 1000);
+
+async function checkIn() {
+    let empId = document.getElementById("empId").value;
+
+    if(!empId){
+        showMessage("Please enter Employee ID", "red");
+        return;
+    }
+
+    let res = await fetch("http://localhost:3000/checkin", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ empId })
+    });
+
+    let msg = await res.text();
+    showMessage(msg, "green");
+}
+
+async function checkOut() {
+    let empId = document.getElementById("empId").value;
+
+    if(!empId){
+        showMessage("Please enter Employee ID", "red");
+        return;
+    }
+
+    let res = await fetch("http://localhost:3000/checkout", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ empId })
+    });
+
+    let msg = await res.text();
+    showMessage(msg, "blue");
+}
+
+function showMessage(text, color){
+    let msg = document.getElementById("msg");
+    msg.innerText = text;
+    msg.style.color = color;
+}
+</script>
+
+</body>
+</html>
