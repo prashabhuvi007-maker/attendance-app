@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Attendance Dashboard</title>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+}
+
+/* Container */
+.container {
+    width: 90%;
+    margin: auto;
+    margin-top: 30px;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+}
+
+/* Header */
+h2 {
+    text-align: center;
+}
+
+/* Button */
+button {
+    background: #4facfe;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+button:hover {
+    background: #007bff;
+}
+
+/* Search */
+input {
+    padding: 8px;
+    width: 200px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #4facfe;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+tr:hover {
+    background: #e0f7ff;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    background: #f1f9ff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    width: 30%;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="logo-container">
+    <div class="card">
+        <!-- Company Logo -->
+    <div style="text-align:center; margin-bottom:15px;">
+        <img src="images/logo.png"" alt="Company Logo" style="height: 200px;">
+    </div>
+
+        <h2>📊 Elegancegeo Attendance Dashboard</h2>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3 id="total">0</h3>
+                <p>Total Records</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="checkedIn">0</h3>
+                <p>Checked In</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="checkedOut">0</h3>
+                <p>Checked Out</p>
+            </div>
+        </div>
+
+        <input type="text" id="search" placeholder="Search Employee..." onkeyup="searchData()">
+
+        <br>
+        <button onclick="loadData()">Load Attendance</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+let allData = [];
+
+async function loadData() {
+    let res = await fetch("http://localhost:3000/records");
+    let data = await res.json();
+    allData = data;
+    renderTable(data);
+    updateStats(data);
+}
+
+function renderTable(data) {
+    let table = document.getElementById("table");
+    table.innerHTML = "";
+    data.forEach(d => {
+        table.innerHTML += `<tr>
+        <td>${d.empId}</td>
+        <td>${new Date(d.checkIn).toLocaleString()}</td>
+        <td>${d.checkOut ? new Date(d.checkOut).toLocaleString() : "-"}</td>
+        </tr>`;
+    });
+}
+
+function searchData() {
+    let value = document.getElementById("search").value.toLowerCase();
+    let filtered = allData.filter(d => d.empId.toLowerCase().includes(value));
+    renderTable(filtered);
+}
+
+function updateStats(data) {
+    document.getElementById("total").innerText = data.length;
+    document.getElementById("checkedIn").innerText = data.filter(d => d.checkIn).length;
+    document.getElementById("checkedOut").innerText = data.filter(d => d.checkOut).length;
+}
+</script>
+
+</body>
+</html>
